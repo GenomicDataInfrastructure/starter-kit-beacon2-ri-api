@@ -35,7 +35,7 @@ Then, if the user is created in LS-AAI, just add its permissions in permissions.
 
 ### Beacon ready for Beacon Network
 
-In order to add your beacon to the Beacon Network, please modify the file conf.py inside beacon folder and edit these variables with your uri:
+In order to add your beacon to the Beacon Network, please modify the file conf.py inside beacon folder and edit these variables with your beacon's info:
 ```bash
 beacon_id = 'org.ega-archive.ga4gh-approval-beacon-test'  # ID of the Beacon
 beacon_name = 'GA4GH Approval Beacon Test'  # Name of the Beacon service
