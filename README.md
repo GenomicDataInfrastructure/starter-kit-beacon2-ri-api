@@ -33,6 +33,14 @@ idp_introspection = 'http://ls-aai-mock:8080/oidc/introspect'
 ```
 Then, if the user is created in LS-AAI, just add its permissions in permissions.yml file and you should have a beacon connecting to real LS AAI.
 
+### Beacon ready for Beacon Network
+
+In order to add your beacon to the Beacon Network, please modify the file conf.py inside beacon folder and edit this variable with your uri:
+```bash
+uri = 'https://ega-archive.org/test-beacon-apis/cineca/'
+```
+
+
 ### Version notes
 
 * Fusions (`mateName`) are not supported.
