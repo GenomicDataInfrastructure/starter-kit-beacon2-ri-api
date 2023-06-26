@@ -13,25 +13,39 @@ docker network create my-app-network
 
 > [Local deployment instructions](deploy/README.md)
 
-### Managing AAI-LSAAI permissions
+# LifeScience Authentication and Authorisation
 
-To give the right permissions for AAI you will need to set the permissions of the users inside permissions folder, within the [permissions.yml](permissions/permissions.yml) file. 
-Please, bear in mind that the name of the user has to be the same that you used when creating the user in LS or in IDP, whatever the AAI method you are working with.
-Furthermore, if you are using LS-AAI method, you will need to get the authorization code following LS-AAI authorization flow method with a browser (for example http://localhost:8080/oidc/auth/authorize?response_type=code&client_id=app-123) and then pass this code via a POST request to get the authorization token. For example:
+### Managing permissions
+
+There are three levels of datasets security: PUBLIC, REGISTERED AND CONTROLLED.
+If you wish to make a dataset PUBLIC, just add it in the list of the [public_datasets.yml](beacon/request/public_datasets.yml) file.
+If you wish to make a dataset REGISTERED, add it to all the users' permissions list in the [permissions.yml](permissions/permissions.yml) file. 
+If you wish to make a dataset CONTROLLED, add it only to the users that have rights to access the dataset in their list of dataset permissions in the [permissions.yml](permissions/permissions.yml) file.
+Please, bear in mind that the name of the user has to be the same that you used when creating the user in LS.
+
+### Creating your service registry
+
+In order to auhenticate your Beacon users with LS, you will need to create a service registry to provide a Client for your users authentication. Go to this link https://services.aai.lifescience-ri.eu/spreg/ and creahe the service registry for your Beacon.
+
+### Setting up Client ID and Secret ID for LS AAI
+
+Located at [permissions](permissions/) directory, you will need to create an .env file with the next bash command:
 ```bash
-curl --location --request POST 'http://localhost:8080/oidc/token' \--header 'Content-Type: application/x-www-form-urlencoded' \--data-urlencode 'grant_type=authorization_code' \--data-urlencode 'code=pasteyourcodefrombrowserhere' \--data-urlencode 'client_id=app-123' \--data-urlencode 'client_secret=secret_value' \--data-urlencode 'scope=openid' \
+touch .env
+```
+Inside this file, you will need to add the CLIENT SECRET and CLIENT ID keys for your LS AAI Registry service, like this:
+```bash
+CLIENT_SECRET='your_client_secret'
+CLIENT_ID='your_client_id'
+```
+### Authentication flow with LS AAI
+
+First, log in with LS in the LS page. After having logged in, you will need to get the authorization code following LS-AAI authorization flow method with a browser pasting the next link (modifying the link with your client id) https://login.elixir-czech.org/oidc/auth/authorize?response_type=code&client_id=pasteyourclientidhere. Then, you will need to keep this code and also get your registry service client id and client secret key and then pass the three variables via the next POST request to get the authorization token:
+```bash
+curl --location --request POST 'https://login.elixir-czech.org/oidc/token' \--header 'Content-Type: application/x-www-form-urlencoded' \--data-urlencode 'grant_type=authorization_code' \--data-urlencode 'code=paste_your_authorization_code_here' \--data-urlencode 'client_id=paste_your_client_id_here' \--data-urlencode 'client_secret=paste_your_client_secret_here' \--data-urlencode 'scope=openid' \
 --data-urlencode 'requested_token_type=urn:ietf:params:oauth:token-type:refresh_token'
 ```
-When you have your authorization token, pass it in a header in your POST request to get your answers.
-
-### Making real LS AAI work
-
-This repository is made to work with mock LS AAI. It still has not been developed to work with real LS AAI. However, real LS AAI should inmediately work with only a couple of changes. In order to make it work with real LS AAI, please change the mock for the real LS AAI endpoints in the auth.py file inside permissions folder:
-```bash
-idp_user_info  = 'http://ls-aai-mock:8080/oidc/userinfo'
-idp_introspection = 'http://ls-aai-mock:8080/oidc/introspect'
-```
-Then, if the user is created in LS-AAI, just add its permissions in permissions.yml file and you should have a beacon connecting to real LS AAI.
+When you have your authorization token, pass it in a header in your POST request to get your authenticated response.
 
 ### Beacon ready for Beacon Network
 
@@ -43,11 +57,9 @@ api_version = 'v2.0.0'  # Version of the Beacon implementation
 uri = 'https://ega-archive.org/test-beacon-apis/cineca/'
 ```
 
-
 ### Version notes
 
 * Fusions (`mateName`) are not supported.
-
 
 ### Acknowlegments
 

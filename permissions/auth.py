@@ -11,6 +11,8 @@ No JWT signature verification.
 """
 
 import logging
+from decouple import config
+import os
 
 from aiohttp import ClientSession, BasicAuth, FormData
 from aiohttp import web
@@ -21,12 +23,12 @@ LOG = logging.getLogger(__name__)
 
 
 
-idp_client_id     = 'permissions'
-idp_client_secret = 'c0285717-1bfb-4b32-b01d-d663470ce7c4'
+idp_client_id     = config('CLIENT_ID')
+idp_client_secret = config('CLIENT_SECRET')
 #idp_user_info = 'http://localhost:8080/oidc/userinfo'
-idp_user_info = 'http://ls-aai-mock:8080/oidc/userinfo'
+idp_user_info = 'https://login.elixir-czech.org/oidc/userinfo'
 #idp_user_info  = 'http://idp:8080/auth/realms/Beacon/protocol/openid-connect/userinfo'
-idp_introspection = 'http://ls-aai-mock:8080/oidc/introspect'
+idp_introspection = 'https://login.elixir-czech.org/oidc/introspect'
 #idp_introspection = 'http://idp:8000/auth/realms/Beacon/protocol/openid-connect/token/introspect'
 #idp_user_info     = 'http://idp:8080/auth/realms/Beacon/protocol/openid-connect/userinfo'
 #idp_introspection = 'http://idp:8080/auth/realms/Beacon/protocol/openid-connect/token/introspect'

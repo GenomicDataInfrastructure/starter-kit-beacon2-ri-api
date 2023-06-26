@@ -205,6 +205,7 @@ def find_ontology_terms_used(collection_name: str) -> List[Dict]:
                     if term not in terms_ids:
                         terms_ids.append(term)
             i += 10000
+            print(i)
     else:
         xs = client.beacon.get_collection(collection_name).find().skip(0).limit(10000)
         for r in tqdm(xs, total=num_total):
@@ -295,7 +296,7 @@ def get_filtering_object(terms_ids: list, collection_name: str):
                                                 'scope': collection_name
                                             })
 
-                #print(terms)
+                print(terms)
         except Exception:
             pass
         
