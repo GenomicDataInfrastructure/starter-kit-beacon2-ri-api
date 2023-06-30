@@ -141,6 +141,7 @@ def build_beacon_resultset_response_by_dataset(data,
                         response_dict[dataset_id].append(doc)
                     else:
                         data.remove(doc)
+                        data=list(dict.fromkeys(data))
                 except Exception:
                     pass
 
