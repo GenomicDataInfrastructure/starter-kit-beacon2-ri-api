@@ -57,7 +57,7 @@ def get_individuals(entry_id: Optional[str], qparams: RequestParams):
         pre_docs = get_documents(
             client.beacon.individuals,
             query,
-            qparams.query.pagination.skip,
+            0,
             count
         )
         negative_query={}
@@ -72,16 +72,16 @@ def get_individuals(entry_id: Optional[str], qparams: RequestParams):
         docs = get_documents(
             client.beacon.individuals,
             negative_query,
-            qparams.query.pagination.skip,
-            qparams.query.pagination.limit
+            0,
+            0
         )
         count = get_count(client.beacon.individuals, negative_query)
     else:
         docs = get_documents(
             client.beacon.individuals,
             query,
-            qparams.query.pagination.skip,
-            qparams.query.pagination.limit
+            0,
+            0
         )
     return schema, count, docs
 

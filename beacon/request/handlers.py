@@ -6,6 +6,7 @@ from aiohttp.web_request import Request
 from bson import json_util
 from beacon import conf
 import yaml
+import jwt
 
 from beacon.request import ontologies
 from beacon.request.model import Granularity, RequestParams
@@ -48,12 +49,28 @@ def generic_handler(db_fn, request=None):
         # Get params
         json_body = await request.json() if request.method == "POST" and request.has_body and request.can_read_body else {}
         qparams = RequestParams(**json_body).from_request(request)
+        skip = qparams.query.pagination.skip
+        limit = qparams.query.pagination.limit
+        LOG.debug(limit)
+
 
         LOG.debug(qparams)
         
         search_datasets = []
         authenticated=False
         access_token = request.headers.get('Authorization')
+        try:
+            visa_token = request.headers.get('GA4GH_Passport')
+            visa = jwt.decode(visa_token, options={"verify_signature": False}, algorithms=["RS256"])
+            LOG.debug(visa)
+            LOG.debug(visa["ga4gh_visa_v1"]["value"])
+            dataset_url = visa["ga4gh_visa_v1"]["value"]
+            dataset_url_splitted = dataset_url.split('/')
+            visa_dataset = dataset_url_splitted[-1]
+            LOG.debug(visa_dataset)
+        except Exception:
+            visa_dataset = None
+
         LOG.debug(access_token)
         if access_token is not None:
             with open("/beacon/beacon/request/public_datasets.yml", 'r') as stream:
@@ -80,6 +97,8 @@ def generic_handler(db_fn, request=None):
             specific_search_datasets = []
             for public_dataset in list_of_public_datasets:
                 authorized_datasets.append(public_dataset)
+            if visa_dataset:
+                authorized_datasets.append(visa_dataset)
             # Get response
             if specific_datasets != []:
                 for element in authorized_datasets:
@@ -130,6 +149,7 @@ def generic_handler(db_fn, request=None):
                 qparams.query.request_parameters['datasets'] = '*******'
                 _, _, datasets = get_datasets(None, qparams)
                 beacon_datasets = [ r for r in datasets ]
+                LOG.debug(authorized_datasets)
                 specific_datasets = [ r['id'] for r in beacon_datasets if r['id'] not in authorized_datasets]
                 response_datasets = [ r['id'] for r in beacon_datasets if r['id'] in authorized_datasets]
                 LOG.debug(specific_datasets)
@@ -153,7 +173,7 @@ def generic_handler(db_fn, request=None):
                     dict_dataset['dataset']=data_s
                     dict_dataset['ids'] = ['Unauthorized dataset']
                     list_of_dataset_dicts.append(dict_dataset)
-                LOG.debug(list_of_dataset_dicts)
+                #LOG.debug(list_of_dataset_dicts)
         else:
             #write here code for public datasets
             list_of_dataset_dicts=[]
@@ -181,6 +201,16 @@ def generic_handler(db_fn, request=None):
         entity_schema, count, records = db_fn(entry_id, qparams)
         LOG.debug(entity_schema)
 
+        if skip == 0:
+            start_record = 0
+            finish_record = limit
+        if limit == 0:
+            start_record = 0
+            finish_record = count 
+        if skip !=0 & limit !=0:
+            start_record = limit*skip - 1
+            finish_record = limit*skip + limit
+
         response_converted = records
         
         if qparams.query.requested_granularity == Granularity.BOOLEAN:
@@ -200,7 +230,7 @@ def generic_handler(db_fn, request=None):
             elif conf.max_beacon_granularity == Granularity.COUNT:
                 response = build_beacon_count_response(response_converted, count, qparams, lambda x, y: x, entity_schema)
             else:
-                response = build_beacon_resultset_response_by_dataset(response_converted, list_of_dataset_dicts, count, qparams, lambda x, y: x, entity_schema)
+                response = build_beacon_resultset_response_by_dataset(response_converted, list_of_dataset_dicts, count, qparams, lambda x, y: x, entity_schema, start_record, finish_record)
                 
         return await json_stream(request, response)
 

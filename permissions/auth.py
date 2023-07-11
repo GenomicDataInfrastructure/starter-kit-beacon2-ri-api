@@ -23,8 +23,10 @@ LOG = logging.getLogger(__name__)
 
 
 
-idp_client_id     = config('CLIENT_ID')
-idp_client_secret = config('CLIENT_SECRET')
+#idp_client_id     = config('CLIENT_ID')
+#idp_client_secret = config('CLIENT_SECRET')
+idp_client_id = ''
+idp_client_secret = ''
 #idp_user_info = 'http://localhost:8080/oidc/userinfo'
 idp_user_info = 'https://login.elixir-czech.org/oidc/userinfo'
 #idp_user_info  = 'http://idp:8080/auth/realms/Beacon/protocol/openid-connect/userinfo'
@@ -63,7 +65,7 @@ async def get_user_info(access_token):
     LOG.error('Invalid token')
     async with ClientSession() as session:
         async with session.post(idp_introspection,
-                                auth=BasicAuth(idp_client_id, password=idp_client_secret),
+                                #auth=BasicAuth(idp_client_id, password=idp_client_secret),
                                 data=FormData({ 'token': access_token, 'token_type_hint': 'access_token' }, charset='UTF-8')
         ) as resp:
             LOG.debug('Response %s', resp.status)
