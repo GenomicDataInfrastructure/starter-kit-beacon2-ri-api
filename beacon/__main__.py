@@ -152,8 +152,6 @@ def main(path=None):
         # will create the UDS socket and bind to it
         web.run_app(beacon, path=path, shutdown_timeout=0, ssl_context=ssl_context)
     else:
-        static_files = Path(__file__).parent.parent.resolve() / "ui" / "static"
-        beacon.add_routes([web.static("/static", str(static_files))])
         web.run_app(
             beacon,
             host=getattr(conf, "beacon_host", "0.0.0.0"),
