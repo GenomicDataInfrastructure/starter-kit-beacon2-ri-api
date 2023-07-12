@@ -52,10 +52,7 @@ def generic_handler(db_fn, request=None):
         skip = qparams.query.pagination.skip
         limit = qparams.query.pagination.limit
         LOG.debug(limit)
-
-
         LOG.debug(qparams)
-        
         search_datasets = []
         authenticated=False
         access_token = request.headers.get('Authorization')
@@ -201,14 +198,17 @@ def generic_handler(db_fn, request=None):
         entity_schema, count, records = db_fn(entry_id, qparams)
         LOG.debug(entity_schema)
 
-        if skip == 0:
+        if skip == 0 and limit !=0:
             start_record = 0
             finish_record = limit
-        if limit == 0:
+        if limit == 0 and skip ==0:
             start_record = 0
             finish_record = count 
-        if skip !=0 & limit !=0:
-            start_record = limit*skip - 1
+        if limit == 0 and skip !=0:
+            start_record = skip
+            finish_record = count 
+        if skip !=0 and limit !=0:
+            start_record = limit*skip
             finish_record = limit*skip + limit
 
         response_converted = records
