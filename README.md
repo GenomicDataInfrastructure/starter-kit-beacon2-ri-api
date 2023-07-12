@@ -15,7 +15,7 @@ docker network create my-app-network
 
 # LifeScience Authentication and Authorisation
 
-### Managing permissions
+### Managing permissions with Beacon
 
 There are three levels of datasets security: PUBLIC, REGISTERED AND CONTROLLED.
 If you wish to make a dataset PUBLIC, just add it in the list of the [public_datasets.yml](beacon/request/public_datasets.yml) file.
@@ -23,21 +23,10 @@ If you wish to make a dataset REGISTERED, add it to all the users' permissions l
 If you wish to make a dataset CONTROLLED, add it only to the users that have rights to access the dataset in their list of dataset permissions in the [permissions.yml](permissions/permissions.yml) file.
 Please, bear in mind that the name of the user has to be the same that you used when creating the user in LS.
 
-### Creating your service registry
+### Managing permissions with GA4GH Visas
 
-In order to auhenticate your Beacon users with LS, you will need to create a service registry to provide a Client for your users authentication. Go to this link https://services.aai.lifescience-ri.eu/spreg/ and creahe the service registry for your Beacon.
+If you want to allow a user to query a dataset with GA4GH Visas, you also can. Just add the GA4GH Visa in your headers with the title GA4GH Passport, like this: ```-H 'GA4GH_Passport: (token)``` and it will authorize your user for the dataset. 
 
-### Setting up Client ID and Secret ID for LS AAI
-
-Located at [permissions](permissions/) directory, you will need to create an .env file with the next bash command:
-```bash
-touch .env
-```
-Inside this file, you will need to add the CLIENT SECRET and CLIENT ID keys for your LS AAI Registry service, like this:
-```bash
-CLIENT_SECRET='your_client_secret'
-CLIENT_ID='your_client_id'
-```
 ### Authentication flow with LS AAI
 
 First, log in with LS in the LS page. After having logged in, you will need to get the authorization code following LS-AAI authorization flow method with a browser pasting the next link (modifying the link with your client id) https://login.elixir-czech.org/oidc/auth/authorize?response_type=code&client_id=pasteyourclientidhere. Then, you will need to keep this code and also get your registry service client id and client secret key and then pass the three variables via the next POST request to get the authorization token:
