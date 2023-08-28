@@ -34,13 +34,13 @@ With `mongo-express` we can see the contents of the database at [http://localhos
 To load the database we execute the following commands:
 
 ```bash
-docker cp /path/to/analyses.json deploy_db_1:tmp/analyses.json
-docker cp /path/to/biosamples.json deploy_db_1:tmp/biosamples.json
-docker cp /path/to/cohorts.json deploy_db_1:tmp/cohorts.json
-docker cp /path/to/datasets.json deploy_db_1:tmp/datasets.json
-docker cp /path/to/genomicVariationsVcf.json deploy_db_1:tmp/genomicVariations.json
-docker cp /path/to/individuals.json deploy_db_1:tmp/individuals.json
-docker cp /path/to/runs.json deploy_db_1:tmp/runs.json
+docker cp ./data/analyses.json deploy_db_1:tmp/analyses.json
+docker cp ./data/biosamples.json deploy_db_1:tmp/biosamples.json
+docker cp ./data/cohorts.json deploy_db_1:tmp/cohorts.json
+docker cp ./data/datasets.json deploy_db_1:tmp/datasets.json
+docker cp ./data/genomicVariations.json deploy_db_1:tmp/genomicVariations.json
+docker cp ./data/individuals.json deploy_db_1:tmp/individuals.json
+docker cp ./data/runs.json deploy_db_1:tmp/runs.json
 ```
 
 ```bash
