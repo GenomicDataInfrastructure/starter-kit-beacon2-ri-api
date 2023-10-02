@@ -6,7 +6,6 @@ from aiohttp.web_request import Request
 from bson import json_util
 from beacon import conf
 import yaml
-import jwt
 
 from beacon.request import ontologies
 from beacon.request.model import Granularity, RequestParams
@@ -56,17 +55,6 @@ def generic_handler(db_fn, request=None):
         search_datasets = []
         authenticated=False
         access_token = request.headers.get('Authorization')
-        try:
-            visa_token = request.headers.get('GA4GH_Passport')
-            visa = jwt.decode(visa_token, options={"verify_signature": False}, algorithms=["RS256"])
-            LOG.debug(visa)
-            LOG.debug(visa["ga4gh_visa_v1"]["value"])
-            dataset_url = visa["ga4gh_visa_v1"]["value"]
-            dataset_url_splitted = dataset_url.split('/')
-            visa_dataset = dataset_url_splitted[-1]
-            LOG.debug(visa_dataset)
-        except Exception:
-            visa_dataset = None
 
         LOG.debug(access_token)
         if access_token is not None:
@@ -94,8 +82,6 @@ def generic_handler(db_fn, request=None):
             specific_search_datasets = []
             for public_dataset in list_of_public_datasets:
                 authorized_datasets.append(public_dataset)
-            if visa_dataset:
-                authorized_datasets.append(visa_dataset)
             # Get response
             if specific_datasets != []:
                 for element in authorized_datasets:
@@ -187,7 +173,7 @@ def generic_handler(db_fn, request=None):
                 dict_dataset['dataset']=data_r
                 dict_dataset['ids']=[ r['ids'] for r in beacon_datasets if r['id'] == data_r ]
                 list_of_dataset_dicts.append(dict_dataset)
-            LOG.debug(list_of_dataset_dicts)
+            #LOG.debug(list_of_dataset_dicts)
 
             
 
@@ -195,6 +181,8 @@ def generic_handler(db_fn, request=None):
         
 
         entry_id = request.match_info.get('id', None)
+        if entry_id == None:
+            entry_id = request.match_info.get('variantInternalId', None)
         entity_schema, count, records = db_fn(entry_id, qparams)
         LOG.debug(entity_schema)
 

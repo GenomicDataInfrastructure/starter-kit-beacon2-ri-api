@@ -152,6 +152,7 @@ def main(path=None):
         # will create the UDS socket and bind to it
         web.run_app(beacon, path=path, shutdown_timeout=0, ssl_context=ssl_context)
     else:
+
         web.run_app(
             beacon,
             host=getattr(conf, "beacon_host", "0.0.0.0"),
