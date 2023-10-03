@@ -56,6 +56,18 @@ def generic_handler(db_fn, request=None):
         authenticated=False
         access_token = request.headers.get('Authorization')
 
+        try:
+            visa_token = request.headers.get('GA4GH_Passport')
+            visa = jwt.decode(visa_token, options={"verify_signature": False}, algorithms=["RS256"])
+            LOG.debug(visa)
+            LOG.debug(visa["ga4gh_visa_v1"]["value"])
+            dataset_url = visa["ga4gh_visa_v1"]["value"]
+            dataset_url_splitted = dataset_url.split('/')
+            visa_dataset = dataset_url_splitted[-1]
+            LOG.debug(visa_dataset)
+        except Exception:
+            visa_dataset = None
+
         LOG.debug(access_token)
         if access_token is not None:
             with open("/beacon/beacon/request/public_datasets.yml", 'r') as stream:
@@ -82,6 +94,8 @@ def generic_handler(db_fn, request=None):
             specific_search_datasets = []
             for public_dataset in list_of_public_datasets:
                 authorized_datasets.append(public_dataset)
+            if visa_dataset:
+                authorized_datasets.append(visa_dataset)
             # Get response
             if specific_datasets != []:
                 for element in authorized_datasets:
