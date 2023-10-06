@@ -6,6 +6,7 @@ from aiohttp.web_request import Request
 from bson import json_util
 from beacon import conf
 import yaml
+import jwt
 
 from beacon.request import ontologies
 from beacon.request.model import Granularity, RequestParams
