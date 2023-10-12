@@ -1,6 +1,6 @@
 name: Publish Docker image
 
-# Building and pushing a new Docker image when:
+# Building and pushing a new Docker image to GitHub Packages when:
 # > commit to master branch: ghcr.io/genomicdatainfrastructure/starter-kit-beacon2-ri-api:master
 # > tagging with 'v'-prefix: ghcr.io/genomicdatainfrastructure/starter-kit-beacon2-ri-api:<semantic-version>
 # > pull-request:            ghcr.io/genomicdatainfrastructure/starter-kit-beacon2-ri-api:pr-<id>
@@ -18,7 +18,7 @@ on:
 
 jobs:
   build-and-push-image:
-    name: Push Docker image to Docker Hub
+    name: Push Docker image to GitHub Packages
     runs-on: ubuntu-latest
 
     # Needs a permission to write to GitHub Packages:
