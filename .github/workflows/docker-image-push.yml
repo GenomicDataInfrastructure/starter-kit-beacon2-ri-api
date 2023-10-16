@@ -1,0 +1,54 @@
+name: Publish Docker image
+
+# Building and pushing a new Docker image to GitHub Packages when:
+# > commit to master branch: ghcr.io/genomicdatainfrastructure/starter-kit-beacon2-ri-api:master
+# > tagging with 'v'-prefix: ghcr.io/genomicdatainfrastructure/starter-kit-beacon2-ri-api:<semantic-version>
+# > pull-request:            ghcr.io/genomicdatainfrastructure/starter-kit-beacon2-ri-api:pr-<id>
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'master'
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - 'master'
+
+jobs:
+  build-and-push-image:
+    name: Push Docker image to GitHub Packages
+    runs-on: ubuntu-latest
+
+    # Needs a permission to write to GitHub Packages:
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          # Indicates that the Docker build context is the current directory.
+          # Otherwise, it would be a Git URL (doing a separate clean checkout).
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

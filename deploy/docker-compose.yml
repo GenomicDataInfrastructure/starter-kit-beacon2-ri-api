@@ -57,7 +57,7 @@ services:
 
   beacon:
     build: ..
-    image: egarchive/beacon:2.0
+    image: ghcr.io/genomicdatainfrastructure/starter-kit-beacon2-ri-api:master
     hostname: beacon
     container_name: beacon
     volumes:
@@ -83,7 +83,7 @@ services:
   ###########################################
   
   permissions:
-    image: egarchive/beacon:2.0
+    image: ghcr.io/genomicdatainfrastructure/starter-kit-beacon2-ri-api:master
     hostname: beacon-permissions
     container_name: beacon-permissions
     volumes:
@@ -99,4 +99,3 @@ services:
     #entrypoint: ['/bin/sleep','100000000']
     working_dir: '/beacon'
     entrypoint: ['python','-m', 'permissions']
-
